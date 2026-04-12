@@ -18,3 +18,37 @@ export interface User {
   laoLastName: string;  // max 50
   civilityId: number;   // FK → Civility
 }
+
+export interface Activity {
+  id: number;
+  description: string; // max 50
+  startDate: string;   // ISO date string
+  endDate: string;     // ISO date string
+  estimation: number;
+  total: number;
+  expense: number;
+  checkTotal: number;
+  cashTotal: number;
+}
+
+export interface PaymentMethod {
+  id: number;
+  description: string; // max 15
+}
+
+export interface Transaction {
+  id: number;
+  activityId: number;  // FK → Activity
+  userId: number;      // FK → User
+  date: string;        // ISO date string
+  amount: number;
+  totalExpense: number;
+  receiptDate: string; // ISO date string
+  paymentMethod: number; // FK → PaymentMethod
+  receiptId: string;   // max 10
+  notes: string;       // max 50
+  checkNumber: number; // max 4 digits
+  bankName: string;    // max 20
+  bankCity: string;    // max 20
+  checkDate: string;   // ISO date string
+}
