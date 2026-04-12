@@ -3,11 +3,12 @@ import type { User } from '@/types';
 import { useUsers } from '@/hooks/useUsers';
 import { UserSearch } from '@/components/users/UserSearch';
 import { UserTable } from '@/components/users/UserTable';
+import { UserDonations } from '@/components/donations/UserDonations';
 
 export function UsersPage() {
   const { civilities, isLoading, error, searchUsers } = useUsers();
   const [query, setQuery] = useState('');
-  const [selectedUserId, setSelectedUserId] = useState<number | undefined>();
+  const [selectedUser, setSelectedUser] = useState<User | undefined>();
 
   const handleSearch = useCallback((q: string) => {
     setQuery(q);
@@ -16,8 +17,11 @@ export function UsersPage() {
   const filteredUsers = searchUsers(query);
 
   function handleSelect(user: User) {
-    setSelectedUserId(user.id);
-    console.log(user);
+    setSelectedUser(user);
+  }
+
+  function handleClosePanel() {
+    setSelectedUser(undefined);
   }
 
   return (
@@ -51,12 +55,21 @@ export function UsersPage() {
       )}
 
       {!isLoading && !error && (
-        <UserTable
-          users={filteredUsers}
-          civilities={civilities}
-          selectedUserId={selectedUserId}
-          onSelect={handleSelect}
-        />
+        <div className={selectedUser ? 'grid gap-4 lg:grid-cols-2' : undefined}>
+          <UserTable
+            users={filteredUsers}
+            civilities={civilities}
+            selectedUserId={selectedUser?.id}
+            onSelect={handleSelect}
+          />
+          {selectedUser && (
+            <UserDonations
+              user={selectedUser}
+              civilities={civilities}
+              onClose={handleClosePanel}
+            />
+          )}
+        </div>
       )}
     </div>
   );

@@ -1,4 +1,4 @@
-import type { Civility, User } from '../types';
+import type { Civility, User, Activity, PaymentMethod, Transaction } from '../types';
 
 export const mockCivilities: Civility[] = [
   { id: 1, description: 'M.' },
@@ -157,4 +157,64 @@ export const mockUsers: User[] = [
     memberNumber: 10,
     laoLastName: 'ຈີຣາ',
   },
+];
+
+export const mockActivities: Activity[] = [
+  {
+    id: 1,
+    description: 'Collecte annuelle 2024',
+    startDate: '2024-01-01',
+    endDate: '2024-12-31',
+    estimation: 5000,
+    total: 3200,
+    expense: 450,
+    checkTotal: 1800,
+    cashTotal: 1400,
+  },
+  {
+    id: 2,
+    description: 'Parrainage enfants 2024',
+    startDate: '2024-01-01',
+    endDate: '2024-12-31',
+    estimation: 8000,
+    total: 6500,
+    expense: 200,
+    checkTotal: 4000,
+    cashTotal: 2500,
+  },
+  {
+    id: 3,
+    description: 'Aide humanitaire hiver',
+    startDate: '2024-11-01',
+    endDate: '2025-02-28',
+    estimation: 3000,
+    total: 1800,
+    expense: 120,
+    checkTotal: 900,
+    cashTotal: 900,
+  },
+];
+
+export const mockPaymentMethods: PaymentMethod[] = [
+  { id: 1, description: 'Chèque' },
+  { id: 2, description: 'Espèces' },
+  { id: 3, description: 'Virement' },
+];
+
+export const mockTransactions: Transaction[] = [
+  { id: 1,  activityId: 1, userId: 1,  date: '2024-01-15', amount: 50,  totalExpense: 0,   receiptDate: '2024-01-20', paymentMethod: 1, receiptId: 'R2024-001', notes: '',                  checkNumber: 1001, bankName: 'BNP Paribas',   bankCity: 'Paris',      checkDate: '2024-01-14' },
+  { id: 2,  activityId: 2, userId: 1,  date: '2024-03-10', amount: 100, totalExpense: 0,   receiptDate: '2024-03-15', paymentMethod: 3, receiptId: 'R2024-002', notes: 'Don régulier',      checkNumber: 0,    bankName: '',              bankCity: '',           checkDate: '' },
+  { id: 3,  activityId: 1, userId: 2,  date: '2024-02-20', amount: 75,  totalExpense: 0,   receiptDate: '2024-02-25', paymentMethod: 2, receiptId: 'R2024-003', notes: '',                  checkNumber: 0,    bankName: '',              bankCity: '',           checkDate: '' },
+  { id: 4,  activityId: 3, userId: 2,  date: '2024-11-05', amount: 125, totalExpense: 10,  receiptDate: '2024-11-10', paymentMethod: 1, receiptId: 'R2024-004', notes: 'Urgence hiver',     checkNumber: 2042, bankName: 'Crédit Agricole', bankCity: 'Lyon',     checkDate: '2024-11-04' },
+  { id: 5,  activityId: 2, userId: 3,  date: '2024-01-30', amount: 200, totalExpense: 0,   receiptDate: '2024-02-05', paymentMethod: 3, receiptId: 'R2024-005', notes: '',                  checkNumber: 0,    bankName: '',              bankCity: '',           checkDate: '' },
+  { id: 6,  activityId: 1, userId: 3,  date: '2024-05-18', amount: 300, totalExpense: 0,   receiptDate: '2024-05-22', paymentMethod: 1, receiptId: 'R2024-006', notes: 'Mécénat',           checkNumber: 3010, bankName: 'Société Générale', bankCity: 'Marseille', checkDate: '2024-05-17' },
+  { id: 7,  activityId: 3, userId: 4,  date: '2024-11-22', amount: 75,  totalExpense: 5,   receiptDate: '2024-11-28', paymentMethod: 2, receiptId: 'R2024-007', notes: '',                  checkNumber: 0,    bankName: '',              bankCity: '',           checkDate: '' },
+  { id: 8,  activityId: 1, userId: 5,  date: '2024-02-14', amount: 150, totalExpense: 0,   receiptDate: '2024-02-18', paymentMethod: 1, receiptId: 'R2024-008', notes: '',                  checkNumber: 4001, bankName: 'LCL',           bankCity: 'Bordeaux',   checkDate: '2024-02-13' },
+  { id: 9,  activityId: 2, userId: 5,  date: '2024-06-01', amount: 150, totalExpense: 0,   receiptDate: '2024-06-05', paymentMethod: 3, receiptId: 'R2024-009', notes: 'Parrainage Sokha',  checkNumber: 0,    bankName: '',              bankCity: '',           checkDate: '' },
+  { id: 10, activityId: 1, userId: 6,  date: '2024-04-12', amount: 120, totalExpense: 0,   receiptDate: '2024-04-16', paymentMethod: 2, receiptId: 'R2024-010', notes: '',                  checkNumber: 0,    bankName: '',              bankCity: '',           checkDate: '' },
+  { id: 11, activityId: 3, userId: 7,  date: '2024-11-08', amount: 80,  totalExpense: 0,   receiptDate: '2024-11-14', paymentMethod: 1, receiptId: 'R2024-011', notes: '',                  checkNumber: 5023, bankName: 'BNP Paribas',   bankCity: 'Strasbourg', checkDate: '2024-11-07' },
+  { id: 12, activityId: 1, userId: 7,  date: '2024-07-19', amount: 170, totalExpense: 0,   receiptDate: '2024-07-24', paymentMethod: 3, receiptId: 'R2024-012', notes: '',                  checkNumber: 0,    bankName: '',              bankCity: '',           checkDate: '' },
+  { id: 13, activityId: 2, userId: 8,  date: '2024-03-03', amount: 250, totalExpense: 0,   receiptDate: '2024-03-08', paymentMethod: 1, receiptId: 'R2024-013', notes: 'Don annuel',        checkNumber: 6100, bankName: 'Crédit Mutuel', bankCity: 'Nantes',     checkDate: '2024-03-02' },
+  { id: 14, activityId: 1, userId: 9,  date: '2024-05-25', amount: 180, totalExpense: 0,   receiptDate: '2024-05-30', paymentMethod: 2, receiptId: 'R2024-014', notes: '',                  checkNumber: 0,    bankName: '',              bankCity: '',           checkDate: '' },
+  { id: 15, activityId: 3, userId: 10, date: '2024-12-01', amount: 90,  totalExpense: 8,   receiptDate: '2024-12-05', paymentMethod: 1, receiptId: 'R2024-015', notes: 'Aide urgente',      checkNumber: 7200, bankName: 'Caisse Épargne', bankCity: 'Grenoble',  checkDate: '2024-11-30' },
 ];
