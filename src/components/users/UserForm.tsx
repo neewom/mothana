@@ -118,7 +118,7 @@ export function UserForm({ isOpen, selectedUser, isSaving, onSave, onClose }: Us
             <label htmlFor="civilityId" className="text-sm font-medium">Civilité *</label>
             <Select
               value={watch('civilityId') > 0 ? String(watch('civilityId')) : ''}
-              onValueChange={(val: string | null) => setValue('civilityId', Number(val ?? 0), { shouldValidate: true })}
+              onValueChange={(val: string) => setValue('civilityId', Number(val), { shouldValidate: true })}
             >
               <SelectTrigger id="civilityId">
                 <SelectValue placeholder="Sélectionner…" />
