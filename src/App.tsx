@@ -3,7 +3,6 @@ import { Toaster } from '@/components/ui/sonner';
 import { Layout } from './components/layout/Layout';
 import { UsersPage } from './pages/UsersPage';
 import { DonationsPage } from './pages/DonationsPage';
-import { NewDonationPage } from './pages/NewDonationPage';
 
 export default function App() {
   return (
@@ -13,7 +12,6 @@ export default function App() {
           <Route path="/" element={<Navigate to="/users" replace />} />
           <Route path="/users" element={<UsersPage />} />
           <Route path="/donations" element={<DonationsPage />} />
-          <Route path="/donations/new" element={<NewDonationPage />} />
         </Routes>
       </Layout>
       <Toaster />

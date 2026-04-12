@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { Transaction, Activity, PaymentMethod } from '@/types';
 import { transactionService } from '@/services/transactionService';
 import { activityService } from '@/services/activityService';
@@ -10,6 +10,7 @@ interface UseUserTransactionsResult {
   paymentMethods: PaymentMethod[];
   isLoading: boolean;
   error: string | null;
+  reload: () => void;
 }
 
 export function useUserTransactions(userId: number | null): UseUserTransactionsResult {
@@ -18,6 +19,7 @@ export function useUserTransactions(userId: number | null): UseUserTransactionsR
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [tick, setTick] = useState(0);
 
   useEffect(() => {
     if (userId === null) {
@@ -54,7 +56,9 @@ export function useUserTransactions(userId: number | null): UseUserTransactionsR
     return () => {
       cancelled = true;
     };
-  }, [userId]);
+  }, [userId, tick]);
 
-  return { transactions, activities, paymentMethods, isLoading, error };
+  const reload = useCallback(() => setTick((t) => t + 1), []);
+
+  return { transactions, activities, paymentMethods, isLoading, error, reload };
 }

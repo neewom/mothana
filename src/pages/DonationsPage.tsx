@@ -1,18 +1,26 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import type { DonationFilters, Transaction } from '@/types';
 import { useDonations } from '@/hooks/useDonations';
+import { useDonationModal } from '@/hooks/useDonationModal';
 import { DonationFilters as DonationFiltersComponent } from '@/components/donations/DonationFilters';
 import { DonationTable } from '@/components/donations/DonationTable';
+import { DonationForm } from '@/components/donations/DonationForm';
 import { Button } from '@/components/ui/button';
 
 const EMPTY_FILTERS: DonationFilters = {};
 
 export function DonationsPage() {
-  const navigate = useNavigate();
-  const { users, activities, paymentMethods, isLoading, error, filterDonations } =
+  const { users, activities, paymentMethods, isLoading, error, filterDonations, reload } =
     useDonations();
   const [filters, setFilters] = useState<DonationFilters>(EMPTY_FILTERS);
+
+  const donationModal = useDonationModal({
+    onSuccess: () => {
+      reload();
+      toast.success('Don enregistré avec succès');
+    },
+  });
 
   const filtered = filterDonations(filters);
 
@@ -31,7 +39,7 @@ export function DonationsPage() {
             </span>
           )}
         </div>
-        <Button onClick={() => navigate('/donations/new')}>Ajouter un don</Button>
+        <Button onClick={() => donationModal.openCreate()}>Ajouter un don</Button>
       </div>
 
       <DonationFiltersComponent
@@ -66,6 +74,14 @@ export function DonationsPage() {
           onSelect={handleSelect}
         />
       )}
+
+      <DonationForm
+        isOpen={donationModal.isOpen}
+        selectedUserId={donationModal.selectedUserId}
+        isSaving={donationModal.isSaving}
+        onSave={donationModal.save}
+        onClose={donationModal.close}
+      />
     </div>
   );
 }
