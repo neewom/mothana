@@ -64,4 +64,11 @@ describe('DonationFilters', () => {
     fireEvent.change(screen.getByLabelText(/^Au$/i), { target: { value: '2024-12-31' } });
     expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ dateTo: '2024-12-31' }));
   });
+
+  it('shows "Tous" placeholder when no filter is selected', () => {
+    renderFilters();
+    // Each select shows its placeholder when no value is set
+    const placeholders = screen.getAllByText('Tous');
+    expect(placeholders.length).toBeGreaterThanOrEqual(2);
+  });
 });

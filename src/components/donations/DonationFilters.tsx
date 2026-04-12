@@ -27,15 +27,15 @@ export function DonationFilters({
   onReset,
 }: DonationFiltersProps) {
   function handleUser(val: string) {
-    onChange({ ...filters, userId: val ? Number(val) : undefined });
+    onChange({ ...filters, userId: val === 'all' ? undefined : Number(val) });
   }
 
   function handleActivity(val: string) {
-    onChange({ ...filters, activityId: val ? Number(val) : undefined });
+    onChange({ ...filters, activityId: val === 'all' ? undefined : Number(val) });
   }
 
   function handlePaymentMethod(val: string) {
-    onChange({ ...filters, paymentMethodId: val ? Number(val) : undefined });
+    onChange({ ...filters, paymentMethodId: val === 'all' ? undefined : Number(val) });
   }
 
   return (
@@ -50,6 +50,7 @@ export function DonationFilters({
             <SelectValue placeholder="Tous" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="all">Tous</SelectItem>
             {users.map((u) => (
               <SelectItem key={u.id} value={String(u.id)}>
                 {u.firstName} {u.lastName}
@@ -69,6 +70,7 @@ export function DonationFilters({
             <SelectValue placeholder="Toutes" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="all">Tous</SelectItem>
             {activities.map((a) => (
               <SelectItem key={a.id} value={String(a.id)}>
                 {a.description}
@@ -88,6 +90,7 @@ export function DonationFilters({
             <SelectValue placeholder="Tous" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="all">Tous</SelectItem>
             {paymentMethods.map((p) => (
               <SelectItem key={p.id} value={String(p.id)}>
                 {p.description}

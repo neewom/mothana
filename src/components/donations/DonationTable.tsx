@@ -49,13 +49,12 @@ export function DonationTable({
           <TableHead className="hidden sm:table-cell">Activité</TableHead>
           <TableHead>Montant</TableHead>
           <TableHead className="hidden sm:table-cell">Règlement</TableHead>
-          <TableHead className="hidden sm:table-cell">N° reçu</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {transactions.length === 0 ? (
           <TableRow>
-            <TableCell colSpan={6} className="text-center text-muted-foreground">
+            <TableCell colSpan={5} className="text-center text-muted-foreground">
               Aucun don trouvé
             </TableCell>
           </TableRow>
@@ -75,7 +74,6 @@ export function DonationTable({
               <TableCell className="hidden sm:table-cell">
                 {paymentMethodMap.get(transaction.paymentMethod) ?? '—'}
               </TableCell>
-              <TableCell className="hidden sm:table-cell">{transaction.receiptId}</TableCell>
             </TableRow>
           ))
         )}

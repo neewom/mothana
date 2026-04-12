@@ -19,9 +19,6 @@ const schema = z.object({
   date: z.string().min(1, 'Requis'),
   amount: z.number().positive('Doit être positif'),
   paymentMethod: z.number().min(1, 'Requis'),
-  receiptId: z.string().max(10, 'Max 10 caractères'),
-  receiptDate: z.string(),
-  totalExpense: z.number().min(0),
   checkNumber: z.number().int().min(0).max(9999, 'Max 4 chiffres'),
   bankName: z.string().max(20, 'Max 20 caractères'),
   bankCity: z.string().max(20, 'Max 20 caractères'),
@@ -57,18 +54,16 @@ export function DonationForm({
     handleSubmit,
     setValue,
     watch,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
+    mode: 'onChange',
     defaultValues: {
       userId: defaultUserId ?? 0,
       activityId: 0,
       date: '',
       amount: 0,
       paymentMethod: 0,
-      receiptId: '',
-      receiptDate: '',
-      totalExpense: 0,
       checkNumber: 0,
       bankName: '',
       bankCity: '',
@@ -201,26 +196,6 @@ export function DonationForm({
         </div>
       )}
 
-      {/* Reçu */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-1">
-          <label htmlFor="receiptId" className="text-sm font-medium">N° de reçu</label>
-          <Input id="receiptId" {...register('receiptId')} />
-          {errors.receiptId && <p className="text-sm text-destructive">{errors.receiptId.message}</p>}
-        </div>
-        <div className="space-y-1">
-          <label htmlFor="receiptDate" className="text-sm font-medium">Date reçu</label>
-          <Input id="receiptDate" type="date" {...register('receiptDate')} />
-        </div>
-      </div>
-
-      {/* Dépense totale */}
-      <div className="space-y-1">
-        <label htmlFor="totalExpense" className="text-sm font-medium">Dépense totale</label>
-        <Input id="totalExpense" type="number" min={0} step="0.01" {...register('totalExpense', { valueAsNumber: true })} />
-        {errors.totalExpense && <p className="text-sm text-destructive">{errors.totalExpense.message}</p>}
-      </div>
-
       {/* Notes */}
       <div className="space-y-1">
         <label htmlFor="notes" className="text-sm font-medium">Notes</label>
@@ -237,7 +212,7 @@ export function DonationForm({
         <Button type="button" variant="outline" onClick={onCancel} disabled={isSaving}>
           Annuler
         </Button>
-        <Button type="submit" disabled={isSaving}>
+        <Button type="submit" disabled={!isValid || isSaving}>
           {isSaving ? 'Enregistrement…' : 'Enregistrer'}
         </Button>
       </div>

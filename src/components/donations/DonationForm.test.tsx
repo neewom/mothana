@@ -73,7 +73,8 @@ describe('DonationForm', () => {
 
   it('shows validation errors when submitting empty required fields', async () => {
     render(<DonationForm {...defaultProps} />);
-    fireEvent.click(screen.getByRole('button', { name: /enregistrer/i }));
+    // Submit the form directly (button is disabled when invalid)
+    fireEvent.submit(document.querySelector('form')!);
     await waitFor(() => {
       expect(screen.getAllByText('Requis').length).toBeGreaterThan(0);
     });
@@ -84,5 +85,15 @@ describe('DonationForm', () => {
     render(<DonationForm {...defaultProps} />);
     fireEvent.click(screen.getByRole('button', { name: /annuler/i }));
     expect(defaultProps.onCancel).toHaveBeenCalledOnce();
+  });
+
+  it('submit button is disabled when form is empty', () => {
+    render(<DonationForm {...defaultProps} />);
+    expect(screen.getByRole('button', { name: /enregistrer/i })).toBeDisabled();
+  });
+
+  it('submit button is disabled while saving', () => {
+    render(<DonationForm {...defaultProps} isSaving={true} />);
+    expect(screen.getByRole('button', { name: /enregistrement/i })).toBeDisabled();
   });
 });

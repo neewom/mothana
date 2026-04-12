@@ -43,7 +43,6 @@ export function TransactionTable({
           <TableHead>Activité</TableHead>
           <TableHead>Montant</TableHead>
           <TableHead className="hidden sm:table-cell">Règlement</TableHead>
-          <TableHead className="hidden sm:table-cell">N° reçu</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -67,7 +66,6 @@ export function TransactionTable({
               <TableCell className="hidden sm:table-cell">
                 {paymentMethodMap.get(transaction.paymentMethod) ?? '—'}
               </TableCell>
-              <TableCell className="hidden sm:table-cell">{transaction.receiptId}</TableCell>
             </TableRow>
           ))
         )}
