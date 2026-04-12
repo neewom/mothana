@@ -52,3 +52,11 @@ export interface Transaction {
   bankCity: string;    // max 20
   checkDate: string;   // ISO date string
 }
+
+export interface DonationFilters {
+  userId?: number;
+  activityId?: number;
+  paymentMethodId?: number;
+  dateFrom?: string;
+  dateTo?: string;
+}

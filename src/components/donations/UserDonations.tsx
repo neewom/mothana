@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { User, Civility, Transaction } from '@/types';
 import { useUserTransactions } from '@/hooks/useUserTransactions';
 import { TransactionTable } from './TransactionTable';
+import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 
 interface UserDonationsProps {
@@ -11,6 +13,7 @@ interface UserDonationsProps {
 }
 
 export function UserDonations({ user, civilities, onClose }: UserDonationsProps) {
+  const navigate = useNavigate();
   const { transactions, activities, paymentMethods, isLoading, error } =
     useUserTransactions(user.id);
   const [selectedTransactionId, setSelectedTransactionId] = useState<number | undefined>();
@@ -39,6 +42,13 @@ export function UserDonations({ user, civilities, onClose }: UserDonationsProps)
               {transactions.length} don{transactions.length !== 1 ? 's' : ''}
             </p>
           )}
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => navigate(`/donations/new?userId=${user.id}`)}
+          >
+            Ajouter un don pour cet utilisateur
+          </Button>
         </div>
         <button
           type="button"
