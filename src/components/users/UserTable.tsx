@@ -1,3 +1,4 @@
+import { Pencil, Trash2 } from 'lucide-react';
 import type { User, Civility } from '@/types';
 import {
   Table,
@@ -7,12 +8,15 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
 
 interface UserTableProps {
   users: User[];
   civilities: Civility[];
   selectedUserId?: number;
   onSelect: (user: User) => void;
+  onEdit: (user: User) => void;
+  onDelete: (user: User) => void;
 }
 
 function resolveCivility(civilityId: number, civilities: Civility[]): string {
@@ -24,6 +28,8 @@ export function UserTable({
   civilities,
   selectedUserId,
   onSelect,
+  onEdit,
+  onDelete,
 }: UserTableProps) {
   if (users.length === 0) {
     return (
@@ -44,6 +50,7 @@ export function UserTable({
             <TableHead className="hidden sm:table-cell">Ville</TableHead>
             <TableHead className="hidden sm:table-cell">Email</TableHead>
             <TableHead className="hidden sm:table-cell">Téléphone</TableHead>
+            <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -60,6 +67,26 @@ export function UserTable({
               <TableCell className="hidden sm:table-cell">{user.city}</TableCell>
               <TableCell className="hidden sm:table-cell">{user.email}</TableCell>
               <TableCell className="hidden sm:table-cell">{user.phone}</TableCell>
+              <TableCell onClick={(e) => e.stopPropagation()}>
+                <div className="flex gap-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Modifier"
+                    onClick={() => onEdit(user)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Supprimer"
+                    onClick={() => onDelete(user)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

@@ -42,23 +42,33 @@ const users: User[] = [
   },
 ];
 
+function renderTable(overrides?: Partial<Parameters<typeof UserTable>[0]>) {
+  return render(
+    <UserTable
+      users={users}
+      civilities={civilities}
+      onSelect={vi.fn()}
+      onEdit={vi.fn()}
+      onDelete={vi.fn()}
+      {...overrides}
+    />,
+  );
+}
+
 describe('UserTable', () => {
   it('renders the expected column headers', () => {
-    render(
-      <UserTable users={users} civilities={civilities} onSelect={vi.fn()} />,
-    );
+    renderTable();
     expect(screen.getByText('Civilité')).toBeInTheDocument();
     expect(screen.getByText('Nom')).toBeInTheDocument();
     expect(screen.getByText('Prénom')).toBeInTheDocument();
     expect(screen.getByText('Ville')).toBeInTheDocument();
     expect(screen.getByText('Email')).toBeInTheDocument();
     expect(screen.getByText('Téléphone')).toBeInTheDocument();
+    expect(screen.getByText('Actions')).toBeInTheDocument();
   });
 
   it('renders user data rows with resolved civility labels', () => {
-    render(
-      <UserTable users={users} civilities={civilities} onSelect={vi.fn()} />,
-    );
+    renderTable();
     expect(screen.getByText('Dupont')).toBeInTheDocument();
     expect(screen.getByText('Jean')).toBeInTheDocument();
     expect(screen.getByText('M.')).toBeInTheDocument();
@@ -68,16 +78,13 @@ describe('UserTable', () => {
   });
 
   it('displays "Aucun utilisateur trouvé" when the user list is empty', () => {
-    render(
-      <UserTable users={[]} civilities={civilities} onSelect={vi.fn()} />,
-    );
+    renderTable({ users: [] });
     expect(screen.getByText('Aucun utilisateur trouvé')).toBeInTheDocument();
   });
 
   it('calls onSelect with the correct user when a row is clicked', () => {
     const onSelect = vi.fn();
-    render(<UserTable users={users} civilities={civilities} onSelect={onSelect} />);
-
+    renderTable({ onSelect });
     fireEvent.click(screen.getByText('Dupont'));
     expect(onSelect).toHaveBeenCalledOnce();
     expect(onSelect).toHaveBeenCalledWith(users[0]);
@@ -85,7 +92,34 @@ describe('UserTable', () => {
 
   it('does not call onSelect when table is empty', () => {
     const onSelect = vi.fn();
-    render(<UserTable users={[]} civilities={civilities} onSelect={onSelect} />);
+    renderTable({ users: [], onSelect });
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it('calls onEdit with the correct user when edit button is clicked', () => {
+    const onEdit = vi.fn();
+    renderTable({ onEdit });
+    const editButtons = screen.getAllByRole('button', { name: 'Modifier' });
+    fireEvent.click(editButtons[0]);
+    expect(onEdit).toHaveBeenCalledOnce();
+    expect(onEdit).toHaveBeenCalledWith(users[0]);
+  });
+
+  it('calls onDelete with the correct user when delete button is clicked', () => {
+    const onDelete = vi.fn();
+    renderTable({ onDelete });
+    const deleteButtons = screen.getAllByRole('button', { name: 'Supprimer' });
+    fireEvent.click(deleteButtons[1]);
+    expect(onDelete).toHaveBeenCalledOnce();
+    expect(onDelete).toHaveBeenCalledWith(users[1]);
+  });
+
+  it('does not call onSelect when action buttons are clicked', () => {
+    const onSelect = vi.fn();
+    const onEdit = vi.fn();
+    renderTable({ onSelect, onEdit });
+    const editButtons = screen.getAllByRole('button', { name: 'Modifier' });
+    fireEvent.click(editButtons[0]);
     expect(onSelect).not.toHaveBeenCalled();
   });
 });

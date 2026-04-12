@@ -1,14 +1,36 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
+import { toast } from 'sonner';
 import type { User } from '@/types';
 import { useUsers } from '@/hooks/useUsers';
+import { useUserForm } from '@/hooks/useUserForm';
+import { useUserDelete } from '@/hooks/useUserDelete';
 import { UserSearch } from '@/components/users/UserSearch';
 import { UserTable } from '@/components/users/UserTable';
+import { UserForm } from '@/components/users/UserForm';
+import { UserDeleteDialog } from '@/components/users/UserDeleteDialog';
 import { UserDonations } from '@/components/donations/UserDonations';
+import { Button } from '@/components/ui/button';
 
 export function UsersPage() {
-  const { civilities, isLoading, error, searchUsers } = useUsers();
+  const { civilities, isLoading, error, searchUsers, reload } = useUsers();
   const [query, setQuery] = useState('');
   const [selectedUser, setSelectedUser] = useState<User | undefined>();
+  const isEditRef = useRef(false);
+
+  const userForm = useUserForm({
+    onSuccess: () => {
+      reload();
+      toast.success(isEditRef.current ? 'Utilisateur modifié avec succès' : 'Utilisateur créé avec succès');
+    },
+  });
+
+  const userDelete = useUserDelete({
+    onSuccess: () => {
+      reload();
+      setSelectedUser(undefined);
+      toast.success('Utilisateur supprimé');
+    },
+  });
 
   const handleSearch = useCallback((q: string) => {
     setQuery(q);
@@ -26,13 +48,16 @@ export function UsersPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-baseline gap-3">
-        <h1 className="text-2xl font-semibold">Utilisateurs</h1>
-        {!isLoading && !error && (
-          <span className="text-sm text-muted-foreground">
-            {filteredUsers.length} résultat{filteredUsers.length !== 1 ? 's' : ''}
-          </span>
-        )}
+      <div className="flex items-center justify-between">
+        <div className="flex items-baseline gap-3">
+          <h1 className="text-2xl font-semibold">Utilisateurs</h1>
+          {!isLoading && !error && (
+            <span className="text-sm text-muted-foreground">
+              {filteredUsers.length} résultat{filteredUsers.length !== 1 ? 's' : ''}
+            </span>
+          )}
+        </div>
+        <Button onClick={() => { isEditRef.current = false; userForm.openCreate(); }}>Nouvel utilisateur</Button>
       </div>
 
       <UserSearch onSearch={handleSearch} />
@@ -61,6 +86,8 @@ export function UsersPage() {
             civilities={civilities}
             selectedUserId={selectedUser?.id}
             onSelect={handleSelect}
+            onEdit={(user) => { isEditRef.current = true; userForm.openEdit(user); }}
+            onDelete={userDelete.confirmDelete}
           />
           {selectedUser && (
             <UserDonations
@@ -71,6 +98,22 @@ export function UsersPage() {
           )}
         </div>
       )}
+
+      <UserForm
+        isOpen={userForm.isOpen}
+        selectedUser={userForm.selectedUser}
+        isSaving={userForm.isSaving}
+        onSave={userForm.save}
+        onClose={userForm.close}
+      />
+
+      <UserDeleteDialog
+        user={userDelete.deleteTarget}
+        isOpen={userDelete.isDeleteOpen}
+        isDeleting={userDelete.isDeleting}
+        onConfirm={userDelete.handleDeleteConfirm}
+        onCancel={userDelete.handleDeleteCancel}
+      />
     </div>
   );
 }
