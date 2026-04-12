@@ -62,6 +62,7 @@ export function UserForm({ isOpen, selectedUser, isSaving, onSave, onClose }: Us
     handleSubmit,
     setValue,
     reset,
+    watch,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -139,9 +140,8 @@ export function UserForm({ isOpen, selectedUser, isSaving, onSave, onClose }: Us
           <FormItem>
             <FormLabel htmlFor="civilityId">Civilité *</FormLabel>
             <Select
+              value={watch('civilityId') > 0 ? String(watch('civilityId')) : ''}
               onValueChange={(val: string | null) => setValue('civilityId', Number(val ?? 0), { shouldValidate: true })}
-              defaultValue={selectedUser ? String(selectedUser.civilityId) : undefined}
-              key={isOpen ? String(selectedUser?.civilityId ?? 'new') : 'closed'}
             >
               <SelectTrigger id="civilityId">
                 <SelectValue placeholder="Sélectionner…" />
