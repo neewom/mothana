@@ -26,7 +26,7 @@ export function UserDeleteDialog({
   onCancel,
 }: UserDeleteDialogProps) {
   return (
-    <AlertDialog open={isOpen} onOpenChange={(open) => { if (!open) onCancel(); }}>
+    <AlertDialog open={isOpen} onOpenChange={(open: boolean) => { if (!open) onCancel(); }}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>

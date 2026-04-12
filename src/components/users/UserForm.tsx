@@ -126,7 +126,7 @@ export function UserForm({ isOpen, selectedUser, isSaving, onSave, onClose }: Us
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
+    <Dialog open={isOpen} onOpenChange={(open: boolean) => { if (!open) onClose(); }}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>
@@ -139,7 +139,7 @@ export function UserForm({ isOpen, selectedUser, isSaving, onSave, onClose }: Us
           <FormItem>
             <FormLabel htmlFor="civilityId">Civilité *</FormLabel>
             <Select
-              onValueChange={(val) => setValue('civilityId', Number(val), { shouldValidate: true })}
+              onValueChange={(val: string | null) => setValue('civilityId', Number(val ?? 0), { shouldValidate: true })}
               defaultValue={selectedUser ? String(selectedUser.civilityId) : undefined}
               key={isOpen ? String(selectedUser?.civilityId ?? 'new') : 'closed'}
             >

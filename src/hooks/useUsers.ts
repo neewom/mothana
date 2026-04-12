@@ -9,6 +9,7 @@ interface UseUsersReturn {
   isLoading: boolean;
   error: string | null;
   searchUsers: (query: string) => User[];
+  reload: () => void;
 }
 
 export function useUsers(): UseUsersReturn {
@@ -16,6 +17,7 @@ export function useUsers(): UseUsersReturn {
   const [civilities, setCivilities] = useState<Civility[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -43,7 +45,7 @@ export function useUsers(): UseUsersReturn {
 
     fetchData();
     return () => { cancelled = true; };
-  }, []);
+  }, [refreshKey]);
 
   const searchUsers = useCallback(
     (query: string): User[] => {
@@ -60,5 +62,9 @@ export function useUsers(): UseUsersReturn {
     [users],
   );
 
-  return { users, civilities, isLoading, error, searchUsers };
+  const reload = useCallback(() => {
+    setRefreshKey((k) => k + 1);
+  }, []);
+
+  return { users, civilities, isLoading, error, searchUsers, reload };
 }

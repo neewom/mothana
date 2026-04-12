@@ -26,7 +26,7 @@ export const mockUsers: User[] = [
     id: 2,
     civilityId: 2,
     lastName: 'Martin',
-    firstName: 'Sophie',
+    firstName: 'Nicolas',
     address: '5 avenue Victor Hugo',
     zip: '69003',
     city: 'Lyon',
