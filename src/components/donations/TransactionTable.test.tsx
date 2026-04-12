@@ -45,7 +45,6 @@ const transactions: Transaction[] = [
     checkNumber: 1001,
     bankName: 'BNP',
     bankCity: 'Paris',
-    checkDate: '2024-01-14',
   },
   {
     id: 2,
@@ -58,7 +57,6 @@ const transactions: Transaction[] = [
     checkNumber: 0,
     bankName: '',
     bankCity: '',
-    checkDate: '',
   },
 ];
 

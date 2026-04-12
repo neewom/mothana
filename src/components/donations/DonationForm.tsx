@@ -32,7 +32,6 @@ const schema = z.object({
   checkNumber: z.number().int().min(0).max(9999, 'Max 4 chiffres'),
   bankName: z.string().max(20, 'Max 20 caractères'),
   bankCity: z.string().max(20, 'Max 20 caractères'),
-  checkDate: z.string(),
   notes: z.string().max(50, 'Max 50 caractères'),
 });
 
@@ -72,7 +71,6 @@ export function DonationForm({ isOpen, selectedUserId, isSaving, onSave, onClose
       checkNumber: 0,
       bankName: '',
       bankCity: '',
-      checkDate: '',
       notes: '',
     },
   });
@@ -95,8 +93,7 @@ export function DonationForm({ isOpen, selectedUserId, isSaving, onSave, onClose
         checkNumber: 0,
         bankName: '',
         bankCity: '',
-        checkDate: '',
-        notes: '',
+          notes: '',
       });
     }, 0);
     return () => clearTimeout(timer);
@@ -205,10 +202,6 @@ export function DonationForm({ isOpen, selectedUserId, isSaving, onSave, onClose
                   <label htmlFor="checkNumber" className="text-sm font-medium">N° chèque</label>
                   <Input id="checkNumber" type="number" min={0} max={9999} {...register('checkNumber', { valueAsNumber: true })} />
                   {errors.checkNumber && <p className="text-sm text-destructive">{errors.checkNumber.message}</p>}
-                </div>
-                <div className="space-y-1">
-                  <label htmlFor="checkDate" className="text-sm font-medium">Date du chèque</label>
-                  <Input id="checkDate" type="date" {...register('checkDate')} />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">

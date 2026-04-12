@@ -18,7 +18,6 @@ const newDonationData = {
   checkNumber: 0,
   bankName: '',
   bankCity: '',
-  checkDate: '',
 };
 
 describe('useDonationModal', () => {

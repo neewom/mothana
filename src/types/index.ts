@@ -47,7 +47,6 @@ export interface Transaction {
   checkNumber: number; // max 4 digits
   bankName: string;    // max 20
   bankCity: string;    // max 20
-  checkDate: string;   // ISO date string
 }
 
 export interface DonationFilters {

@@ -27,7 +27,6 @@ const transactions: Transaction[] = [
     checkNumber: 0,
     bankName: '',
     bankCity: '',
-    checkDate: '',
   },
 ];
 

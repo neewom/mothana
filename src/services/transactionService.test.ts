@@ -17,7 +17,6 @@ const newTransaction = {
   checkNumber: 0,
   bankName: '',
   bankCity: '',
-  checkDate: '',
 };
 
 describe('transactionService', () => {
