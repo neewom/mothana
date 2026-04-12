@@ -12,15 +12,11 @@ const newTransaction = {
   userId: 1,
   date: '2024-08-01',
   amount: 50,
-  totalExpense: 0,
-  receiptDate: '2024-08-05',
   paymentMethod: 1,
-  receiptId: 'R-TEST',
   notes: '',
   checkNumber: 0,
   bankName: '',
   bankCity: '',
-  checkDate: '',
 };
 
 describe('transactionService', () => {

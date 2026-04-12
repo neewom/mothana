@@ -42,13 +42,17 @@ export interface Transaction {
   userId: number;      // FK → User
   date: string;        // ISO date string
   amount: number;
-  totalExpense: number;
-  receiptDate: string; // ISO date string
   paymentMethod: number; // FK → PaymentMethod
-  receiptId: string;   // max 10
   notes: string;       // max 50
   checkNumber: number; // max 4 digits
   bankName: string;    // max 20
   bankCity: string;    // max 20
-  checkDate: string;   // ISO date string
+}
+
+export interface DonationFilters {
+  userId?: number;
+  activityId?: number;
+  paymentMethodId?: number;
+  dateFrom?: string;
+  dateTo?: string;
 }

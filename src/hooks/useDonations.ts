@@ -1,20 +1,24 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { Transaction, Activity, PaymentMethod } from '@/types';
+import type { Transaction, Activity, PaymentMethod, User, DonationFilters } from '@/types';
 import { transactionService } from '@/services/transactionService';
 import { activityService } from '@/services/activityService';
 import { paymentMethodService } from '@/services/paymentMethodService';
+import { userService } from '@/services/userService';
 
-interface UseUserTransactionsResult {
+interface UseDonationsResult {
   transactions: Transaction[];
+  users: User[];
   activities: Activity[];
   paymentMethods: PaymentMethod[];
   isLoading: boolean;
   error: string | null;
+  filterDonations: (filters: DonationFilters) => Transaction[];
   reload: () => void;
 }
 
-export function useUserTransactions(userId: number | null): UseUserTransactionsResult {
+export function useDonations(): UseDonationsResult {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -22,43 +26,50 @@ export function useUserTransactions(userId: number | null): UseUserTransactionsR
   const [tick, setTick] = useState(0);
 
   useEffect(() => {
-    if (userId === null) {
-      setTransactions([]);
-      setActivities([]);
-      setPaymentMethods([]);
-      setIsLoading(false);
-      setError(null);
-      return;
-    }
-
     let cancelled = false;
     setIsLoading(true);
     setError(null);
 
     Promise.all([
-      transactionService.getByUserId(userId),
+      transactionService.getAll(),
+      userService.getAll(),
       activityService.getAll(),
       paymentMethodService.getAll(),
     ])
-      .then(([txs, acts, methods]) => {
+      .then(([txs, us, acts, methods]) => {
         if (cancelled) return;
         setTransactions(txs);
+        setUsers(us);
         setActivities(acts);
         setPaymentMethods(methods);
         setIsLoading(false);
       })
       .catch((err: unknown) => {
         if (cancelled) return;
-        setError(err instanceof Error ? err.message : 'Erreur lors du chargement des dons');
+        setError(err instanceof Error ? err.message : 'Erreur lors du chargement');
         setIsLoading(false);
       });
 
     return () => {
       cancelled = true;
     };
-  }, [userId, tick]);
+  }, [tick]);
 
   const reload = useCallback(() => setTick((t) => t + 1), []);
 
-  return { transactions, activities, paymentMethods, isLoading, error, reload };
+  const filterDonations = useCallback(
+    (filters: DonationFilters): Transaction[] => {
+      return transactions.filter((t) => {
+        if (filters.userId !== undefined && t.userId !== filters.userId) return false;
+        if (filters.activityId !== undefined && t.activityId !== filters.activityId) return false;
+        if (filters.paymentMethodId !== undefined && t.paymentMethod !== filters.paymentMethodId) return false;
+        if (filters.dateFrom && t.date < filters.dateFrom) return false;
+        if (filters.dateTo && t.date > filters.dateTo) return false;
+        return true;
+      });
+    },
+    [transactions]
+  );
+
+  return { transactions, users, activities, paymentMethods, isLoading, error, filterDonations, reload };
 }

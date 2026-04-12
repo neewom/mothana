@@ -40,15 +40,11 @@ const transactions: Transaction[] = [
     userId: 1,
     date: '2024-01-15',
     amount: 50,
-    totalExpense: 0,
-    receiptDate: '2024-01-20',
     paymentMethod: 1,
-    receiptId: 'R2024-001',
     notes: '',
     checkNumber: 1001,
     bankName: 'BNP',
     bankCity: 'Paris',
-    checkDate: '2024-01-14',
   },
   {
     id: 2,
@@ -56,15 +52,11 @@ const transactions: Transaction[] = [
     userId: 1,
     date: '2024-03-10',
     amount: 100.5,
-    totalExpense: 0,
-    receiptDate: '2024-03-15',
     paymentMethod: 2,
-    receiptId: 'R2024-002',
     notes: '',
     checkNumber: 0,
     bankName: '',
     bankCity: '',
-    checkDate: '',
   },
 ];
 
@@ -82,7 +74,7 @@ describe('TransactionTable', () => {
     expect(screen.getByText('Activité')).toBeInTheDocument();
     expect(screen.getByText('Montant')).toBeInTheDocument();
     expect(screen.getByText('Règlement')).toBeInTheDocument();
-    expect(screen.getByText('N° reçu')).toBeInTheDocument();
+    expect(screen.queryByText('N° reçu')).not.toBeInTheDocument();
   });
 
   it('formats date as dd/mm/yyyy', () => {
@@ -148,7 +140,7 @@ describe('TransactionTable', () => {
         onSelect={onSelect}
       />,
     );
-    fireEvent.click(screen.getByText('R2024-001'));
+    fireEvent.click(screen.getByText('15/01/2024'));
     expect(onSelect).toHaveBeenCalledOnce();
     expect(onSelect).toHaveBeenCalledWith(transactions[0]);
   });

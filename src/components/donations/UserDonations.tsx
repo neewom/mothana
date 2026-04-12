@@ -1,7 +1,11 @@
 import { useState } from 'react';
+import { toast } from 'sonner';
 import type { User, Civility, Transaction } from '@/types';
 import { useUserTransactions } from '@/hooks/useUserTransactions';
+import { useDonationModal } from '@/hooks/useDonationModal';
+import { DonationForm } from './DonationForm';
 import { TransactionTable } from './TransactionTable';
+import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 
 interface UserDonationsProps {
@@ -11,9 +15,16 @@ interface UserDonationsProps {
 }
 
 export function UserDonations({ user, civilities, onClose }: UserDonationsProps) {
-  const { transactions, activities, paymentMethods, isLoading, error } =
+  const { transactions, activities, paymentMethods, isLoading, error, reload } =
     useUserTransactions(user.id);
   const [selectedTransactionId, setSelectedTransactionId] = useState<number | undefined>();
+
+  const donationModal = useDonationModal({
+    onSuccess: () => {
+      reload();
+      toast.success('Don enregistré avec succès');
+    },
+  });
 
   const civilityLabel = civilities.find((c) => c.id === user.civilityId)?.description ?? '';
   const total = transactions.reduce((sum, t) => sum + t.amount, 0);
@@ -39,6 +50,13 @@ export function UserDonations({ user, civilities, onClose }: UserDonationsProps)
               {transactions.length} don{transactions.length !== 1 ? 's' : ''}
             </p>
           )}
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => donationModal.openCreateForUser(user.id)}
+          >
+            Ajouter un don pour cet utilisateur
+          </Button>
         </div>
         <button
           type="button"
@@ -73,6 +91,14 @@ export function UserDonations({ user, civilities, onClose }: UserDonationsProps)
           onSelect={handleSelect}
         />
       )}
+
+      <DonationForm
+        isOpen={donationModal.isOpen}
+        selectedUserId={donationModal.selectedUserId}
+        isSaving={donationModal.isSaving}
+        onSave={donationModal.save}
+        onClose={donationModal.close}
+      />
     </div>
   );
 }
