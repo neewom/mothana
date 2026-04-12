@@ -1,5 +1,18 @@
-function App() {
-  return <h1>Mothana</h1>
-}
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Layout } from './components/layout/Layout';
+import { UsersPage } from './pages/UsersPage';
+import { DonationsPage } from './pages/DonationsPage';
 
-export default App
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Navigate to="/users" replace />} />
+          <Route path="/users" element={<UsersPage />} />
+          <Route path="/donations" element={<DonationsPage />} />
+        </Routes>
+      </Layout>
+    </BrowserRouter>
+  );
+}
