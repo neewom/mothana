@@ -60,36 +60,12 @@ export function UserForm({ isOpen, selectedUser, isSaving, onSave, onClose }: Us
     register,
     handleSubmit,
     setValue,
-    reset,
     watch,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: {
-      civilityId: 0,
-      lastName: '',
-      firstName: '',
-      address: '',
-      zip: '',
-      city: '',
-      email: '',
-      phone: '',
-      fax: '',
-      memberNumber: 0,
-      laoLastName: '',
-      amount: 0,
-    },
-  });
-
-  useEffect(() => {
-    civilityService.getAll().then(setCivilities).catch(() => {});
-  }, []);
-
-  useEffect(() => {
-    if (!isOpen) return;
-    const timeout = setTimeout(() => {
-      if (selectedUser) {
-        reset({
+    values: isOpen && selectedUser
+      ? {
           civilityId: selectedUser.civilityId,
           lastName: selectedUser.lastName,
           firstName: selectedUser.firstName,
@@ -102,9 +78,8 @@ export function UserForm({ isOpen, selectedUser, isSaving, onSave, onClose }: Us
           memberNumber: selectedUser.memberNumber,
           laoLastName: selectedUser.laoLastName,
           amount: selectedUser.amount,
-        });
-      } else {
-        reset({
+        }
+      : {
           civilityId: 0,
           lastName: '',
           firstName: '',
@@ -117,11 +92,12 @@ export function UserForm({ isOpen, selectedUser, isSaving, onSave, onClose }: Us
           memberNumber: 0,
           laoLastName: '',
           amount: 0,
-        });
-      }
-    }, 0);
-    return () => clearTimeout(timeout);
-  }, [isOpen, selectedUser, reset]);
+        },
+  });
+
+  useEffect(() => {
+    civilityService.getAll().then(setCivilities).catch(() => {});
+  }, []);
 
   async function onSubmit(values: FormValues) {
     await onSave(values);

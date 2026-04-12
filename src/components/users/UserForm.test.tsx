@@ -92,4 +92,56 @@ describe('UserForm', () => {
     render(<UserForm {...defaultProps} isOpen={false} />);
     expect(screen.queryByText('Nouvel utilisateur')).not.toBeInTheDocument();
   });
+
+  const editUser = {
+    id: 1,
+    civilityId: 2,
+    lastName: 'Dupont',
+    firstName: 'Jean',
+    address: '12 rue de la Paix',
+    zip: '75001',
+    city: 'Paris',
+    email: 'jean.dupont@email.com',
+    phone: '0612345678',
+    fax: '',
+    memberNumber: 5,
+    laoLastName: '',
+    amount: 100,
+  };
+
+  it('pre-fills lastName field with selected user data', async () => {
+    render(<UserForm {...defaultProps} selectedUser={editUser} />);
+    await waitFor(() => {
+      expect(screen.getByLabelText('Nom *')).toHaveValue('Dupont');
+    });
+  });
+
+  it('pre-fills firstName field with selected user data', async () => {
+    render(<UserForm {...defaultProps} selectedUser={editUser} />);
+    await waitFor(() => {
+      expect(screen.getByLabelText('Prénom *')).toHaveValue('Jean');
+    });
+  });
+
+  it('pre-fills email field with selected user data', async () => {
+    render(<UserForm {...defaultProps} selectedUser={editUser} />);
+    await waitFor(() => {
+      expect(screen.getByLabelText('Email')).toHaveValue('jean.dupont@email.com');
+    });
+  });
+
+  it('pre-fills city field with selected user data', async () => {
+    render(<UserForm {...defaultProps} selectedUser={editUser} />);
+    await waitFor(() => {
+      expect(screen.getByLabelText('Ville')).toHaveValue('Paris');
+    });
+  });
+
+  it('shows empty fields in create mode', async () => {
+    render(<UserForm {...defaultProps} selectedUser={null} />);
+    await waitFor(() => {
+      expect(screen.getByLabelText('Nom *')).toHaveValue('');
+      expect(screen.getByLabelText('Prénom *')).toHaveValue('');
+    });
+  });
 });
