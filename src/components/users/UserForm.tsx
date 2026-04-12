@@ -20,7 +20,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 
 const schema = z.object({
   civilityId: z.number().min(1, 'Requis'),
@@ -87,7 +86,8 @@ export function UserForm({ isOpen, selectedUser, isSaving, onSave, onClose }: Us
   }, []);
 
   useEffect(() => {
-    if (isOpen) {
+    if (!isOpen) return;
+    const timeout = setTimeout(() => {
       if (selectedUser) {
         reset({
           civilityId: selectedUser.civilityId,
@@ -119,7 +119,8 @@ export function UserForm({ isOpen, selectedUser, isSaving, onSave, onClose }: Us
           amount: 0,
         });
       }
-    }
+    }, 0);
+    return () => clearTimeout(timeout);
   }, [isOpen, selectedUser, reset]);
 
   async function onSubmit(values: FormValues) {
@@ -137,8 +138,8 @@ export function UserForm({ isOpen, selectedUser, isSaving, onSave, onClose }: Us
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
           {/* Civilité */}
-          <FormItem>
-            <FormLabel htmlFor="civilityId">Civilité *</FormLabel>
+          <div className="space-y-1">
+            <label htmlFor="civilityId" className="text-sm font-medium">Civilité *</label>
             <Select
               value={watch('civilityId') > 0 ? String(watch('civilityId')) : ''}
               onValueChange={(val: string | null) => setValue('civilityId', Number(val ?? 0), { shouldValidate: true })}
@@ -154,85 +155,85 @@ export function UserForm({ isOpen, selectedUser, isSaving, onSave, onClose }: Us
                 ))}
               </SelectContent>
             </Select>
-            <FormMessage>{errors.civilityId?.message}</FormMessage>
-          </FormItem>
+            {errors.civilityId && <p className="text-sm text-destructive">{errors.civilityId.message}</p>}
+          </div>
 
           {/* Nom / Prénom */}
           <div className="grid grid-cols-2 gap-4">
-            <FormItem>
-              <FormLabel htmlFor="lastName">Nom *</FormLabel>
+            <div className="space-y-1">
+              <label htmlFor="lastName" className="text-sm font-medium">Nom *</label>
               <Input id="lastName" {...register('lastName')} />
-              <FormMessage>{errors.lastName?.message}</FormMessage>
-            </FormItem>
-            <FormItem>
-              <FormLabel htmlFor="firstName">Prénom *</FormLabel>
+              {errors.lastName && <p className="text-sm text-destructive">{errors.lastName.message}</p>}
+            </div>
+            <div className="space-y-1">
+              <label htmlFor="firstName" className="text-sm font-medium">Prénom *</label>
               <Input id="firstName" {...register('firstName')} />
-              <FormMessage>{errors.firstName?.message}</FormMessage>
-            </FormItem>
+              {errors.firstName && <p className="text-sm text-destructive">{errors.firstName.message}</p>}
+            </div>
           </div>
 
           {/* Adresse */}
-          <FormItem>
-            <FormLabel htmlFor="address">Adresse</FormLabel>
+          <div className="space-y-1">
+            <label htmlFor="address" className="text-sm font-medium">Adresse</label>
             <Input id="address" {...register('address')} />
-            <FormMessage>{errors.address?.message}</FormMessage>
-          </FormItem>
+            {errors.address && <p className="text-sm text-destructive">{errors.address.message}</p>}
+          </div>
 
           {/* CP / Ville */}
           <div className="grid grid-cols-3 gap-4">
-            <FormItem>
-              <FormLabel htmlFor="zip">Code postal</FormLabel>
+            <div className="space-y-1">
+              <label htmlFor="zip" className="text-sm font-medium">Code postal</label>
               <Input id="zip" {...register('zip')} />
-              <FormMessage>{errors.zip?.message}</FormMessage>
-            </FormItem>
-            <FormItem className="col-span-2">
-              <FormLabel htmlFor="city">Ville</FormLabel>
+              {errors.zip && <p className="text-sm text-destructive">{errors.zip.message}</p>}
+            </div>
+            <div className="space-y-1 col-span-2">
+              <label htmlFor="city" className="text-sm font-medium">Ville</label>
               <Input id="city" {...register('city')} />
-              <FormMessage>{errors.city?.message}</FormMessage>
-            </FormItem>
+              {errors.city && <p className="text-sm text-destructive">{errors.city.message}</p>}
+            </div>
           </div>
 
           {/* Email */}
-          <FormItem>
-            <FormLabel htmlFor="email">Email</FormLabel>
+          <div className="space-y-1">
+            <label htmlFor="email" className="text-sm font-medium">Email</label>
             <Input id="email" type="email" {...register('email')} />
-            <FormMessage>{errors.email?.message}</FormMessage>
-          </FormItem>
+            {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
+          </div>
 
           {/* Téléphone / Fax */}
           <div className="grid grid-cols-2 gap-4">
-            <FormItem>
-              <FormLabel htmlFor="phone">Téléphone</FormLabel>
+            <div className="space-y-1">
+              <label htmlFor="phone" className="text-sm font-medium">Téléphone</label>
               <Input id="phone" {...register('phone')} />
-              <FormMessage>{errors.phone?.message}</FormMessage>
-            </FormItem>
-            <FormItem>
-              <FormLabel htmlFor="fax">Fax</FormLabel>
+              {errors.phone && <p className="text-sm text-destructive">{errors.phone.message}</p>}
+            </div>
+            <div className="space-y-1">
+              <label htmlFor="fax" className="text-sm font-medium">Fax</label>
               <Input id="fax" {...register('fax')} />
-              <FormMessage>{errors.fax?.message}</FormMessage>
-            </FormItem>
+              {errors.fax && <p className="text-sm text-destructive">{errors.fax.message}</p>}
+            </div>
           </div>
 
           {/* N° adhérent / Montant */}
           <div className="grid grid-cols-2 gap-4">
-            <FormItem>
-              <FormLabel htmlFor="memberNumber">N° adhérent</FormLabel>
+            <div className="space-y-1">
+              <label htmlFor="memberNumber" className="text-sm font-medium">N° adhérent</label>
               <Input id="memberNumber" type="number" min={0} max={99} {...register('memberNumber', { valueAsNumber: true })} />
-              <FormMessage>{errors.memberNumber?.message}</FormMessage>
-            </FormItem>
-            <FormItem>
-              <FormLabel htmlFor="amount">Montant</FormLabel>
+              {errors.memberNumber && <p className="text-sm text-destructive">{errors.memberNumber.message}</p>}
+            </div>
+            <div className="space-y-1">
+              <label htmlFor="amount" className="text-sm font-medium">Montant</label>
               <Input id="amount" type="number" min={0} step="0.01" {...register('amount', { valueAsNumber: true })} />
-              <FormMessage>{errors.amount?.message}</FormMessage>
-            </FormItem>
+              {errors.amount && <p className="text-sm text-destructive">{errors.amount.message}</p>}
+            </div>
           </div>
 
           {/* Nom lao */}
-          <FormItem>
-            <FormLabel htmlFor="laoLastName">Nom en lao</FormLabel>
+          <div className="space-y-1">
+            <label htmlFor="laoLastName" className="text-sm font-medium">Nom en lao</label>
             <Input id="laoLastName" {...register('laoLastName')} />
-            <FormMessage>{errors.laoLastName?.message}</FormMessage>
-          </FormItem>
+            {errors.laoLastName && <p className="text-sm text-destructive">{errors.laoLastName.message}</p>}
+          </div>
 
           <DialogFooter className="gap-2">
             <Button type="button" variant="outline" onClick={onClose} disabled={isSaving}>
