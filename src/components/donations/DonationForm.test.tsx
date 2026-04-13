@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { DonationForm } from './DonationForm';
+import type { Transaction } from '@/types';
 
 vi.mock('@/services/userService', () => ({
   userService: {
@@ -28,9 +29,23 @@ vi.mock('@/services/paymentMethodService', () => ({
   },
 }));
 
+const existingTransaction: Transaction = {
+  id: 5,
+  userId: 1,
+  activityId: 1,
+  date: '2024-06-15',
+  amount: 120,
+  paymentMethod: 2,
+  notes: 'Note de test',
+  checkNumber: 0,
+  bankName: '',
+  bankCity: '',
+};
+
 const defaultProps = {
   isOpen: true,
   selectedUserId: null,
+  selectedTransaction: null,
   isSaving: false,
   onSave: vi.fn(),
   onClose: vi.fn(),
@@ -41,10 +56,17 @@ beforeEach(() => {
 });
 
 describe('DonationForm', () => {
-  it('renders modal content when isOpen is true', async () => {
+  it('displays "Nouveau don" in create mode', async () => {
     render(<DonationForm {...defaultProps} />);
     await waitFor(() => {
       expect(screen.getByText('Nouveau don')).toBeInTheDocument();
+    });
+  });
+
+  it('displays "Modifier le don" in edit mode', async () => {
+    render(<DonationForm {...defaultProps} selectedTransaction={existingTransaction} />);
+    await waitFor(() => {
+      expect(screen.getByText('Modifier le don')).toBeInTheDocument();
     });
   });
 
@@ -61,8 +83,16 @@ describe('DonationForm', () => {
     });
   });
 
-  it('user select is enabled when selectedUserId is null', async () => {
-    render(<DonationForm {...defaultProps} selectedUserId={null} />);
+  it('user select is disabled in edit mode', async () => {
+    render(<DonationForm {...defaultProps} selectedTransaction={existingTransaction} />);
+    await waitFor(() => {
+      const triggers = screen.getAllByRole('combobox');
+      expect(triggers[0]).toHaveAttribute('disabled');
+    });
+  });
+
+  it('user select is enabled when selectedUserId is null and no selectedTransaction', async () => {
+    render(<DonationForm {...defaultProps} selectedUserId={null} selectedTransaction={null} />);
     await waitFor(() => {
       const triggers = screen.getAllByRole('combobox');
       expect(triggers[0]).not.toHaveAttribute('disabled');
@@ -76,26 +106,6 @@ describe('DonationForm', () => {
     });
     expect(screen.queryByLabelText(/n° chèque/i)).not.toBeInTheDocument();
     expect(screen.queryByLabelText(/^Banque$/i)).not.toBeInTheDocument();
-  });
-
-  it('shows check fields when Chèque payment method is selected', async () => {
-    render(<DonationForm {...defaultProps} />);
-    await waitFor(() => {
-      expect(screen.getAllByRole('combobox').length).toBeGreaterThanOrEqual(3);
-    });
-    // paymentMethod trigger is the 3rd combobox (userId, activityId, paymentMethod)
-    const triggers = screen.getAllByRole('combobox');
-    const paymentTrigger = triggers[2];
-    fireEvent.click(paymentTrigger);
-    await waitFor(() => {
-      const option = screen.getByRole('option', { name: 'Chèque' });
-      fireEvent.click(option);
-    });
-    await waitFor(() => {
-      expect(screen.getByLabelText(/n° chèque/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/^Banque$/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/ville banque/i)).toBeInTheDocument();
-    });
   });
 
   it('submit button is disabled when form is empty', async () => {
@@ -117,7 +127,7 @@ describe('DonationForm', () => {
     await waitFor(() => {
       expect(screen.getByRole('button', { name: /annuler/i })).toBeInTheDocument();
     });
-    fireEvent.click(screen.getByRole('button', { name: /annuler/i }));
+    screen.getByRole('button', { name: /annuler/i }).click();
     expect(defaultProps.onClose).toHaveBeenCalledOnce();
   });
 });

@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 import type { User, Civility, Transaction } from '@/types';
 import { useUserTransactions } from '@/hooks/useUserTransactions';
 import { useDonationModal } from '@/hooks/useDonationModal';
+import { useDonationDelete } from '@/hooks/useDonationDelete';
 import { DonationForm } from './DonationForm';
+import { DonationDeleteDialog } from './DonationDeleteDialog';
 import { TransactionTable } from './TransactionTable';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
@@ -18,11 +20,19 @@ export function UserDonations({ user, civilities, onClose }: UserDonationsProps)
   const { transactions, activities, paymentMethods, isLoading, error, reload } =
     useUserTransactions(user.id);
   const [selectedTransactionId, setSelectedTransactionId] = useState<number | undefined>();
+  const isEditRef = useRef(false);
 
   const donationModal = useDonationModal({
     onSuccess: () => {
       reload();
-      toast.success('Don enregistré avec succès');
+      toast.success(isEditRef.current ? 'Don modifié avec succès' : 'Don enregistré avec succès');
+    },
+  });
+
+  const donationDelete = useDonationDelete({
+    onSuccess: () => {
+      reload();
+      toast.success('Don supprimé');
     },
   });
 
@@ -31,6 +41,16 @@ export function UserDonations({ user, civilities, onClose }: UserDonationsProps)
 
   function handleSelect(transaction: Transaction) {
     setSelectedTransactionId(transaction.id);
+  }
+
+  function handleEdit(transaction: Transaction) {
+    isEditRef.current = true;
+    donationModal.openEdit(transaction);
+  }
+
+  function handleOpenCreateForUser() {
+    isEditRef.current = false;
+    donationModal.openCreateForUser(user.id);
   }
 
   return (
@@ -53,7 +73,7 @@ export function UserDonations({ user, civilities, onClose }: UserDonationsProps)
           <Button
             size="sm"
             variant="outline"
-            onClick={() => donationModal.openCreateForUser(user.id)}
+            onClick={handleOpenCreateForUser}
           >
             Ajouter un don pour cet utilisateur
           </Button>
@@ -89,15 +109,26 @@ export function UserDonations({ user, civilities, onClose }: UserDonationsProps)
           paymentMethods={paymentMethods}
           selectedTransactionId={selectedTransactionId}
           onSelect={handleSelect}
+          onEdit={handleEdit}
+          onDelete={(transaction) => donationDelete.confirmDelete(transaction)}
         />
       )}
 
       <DonationForm
         isOpen={donationModal.isOpen}
         selectedUserId={donationModal.selectedUserId}
+        selectedTransaction={donationModal.selectedTransaction}
         isSaving={donationModal.isSaving}
         onSave={donationModal.save}
         onClose={donationModal.close}
+      />
+
+      <DonationDeleteDialog
+        transaction={donationDelete.deleteTarget}
+        isOpen={donationDelete.isDeleteOpen}
+        isDeleting={donationDelete.isDeleting}
+        onConfirm={donationDelete.handleDeleteConfirm}
+        onCancel={donationDelete.handleDeleteCancel}
       />
     </div>
   );

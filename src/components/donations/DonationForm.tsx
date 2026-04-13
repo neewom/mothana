@@ -42,12 +42,20 @@ const CHECK_LABEL = 'Chèque';
 interface DonationFormProps {
   isOpen: boolean;
   selectedUserId: number | null;
+  selectedTransaction: Transaction | null;
   isSaving: boolean;
   onSave: (data: Omit<Transaction, 'id'>) => Promise<void>;
   onClose: () => void;
 }
 
-export function DonationForm({ isOpen, selectedUserId, isSaving, onSave, onClose }: DonationFormProps) {
+export function DonationForm({
+  isOpen,
+  selectedUserId,
+  selectedTransaction,
+  isSaving,
+  onSave,
+  onClose,
+}: DonationFormProps) {
   const [users, setUsers] = useState<User[]>([]);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
@@ -84,24 +92,41 @@ export function DonationForm({ isOpen, selectedUserId, isSaving, onSave, onClose
   useEffect(() => {
     if (!isOpen) return;
     const timer = setTimeout(() => {
-      reset({
-        userId: selectedUserId ?? 0,
-        activityId: 0,
-        date: '',
-        amount: 0,
-        paymentMethod: 0,
-        checkNumber: 0,
-        bankName: '',
-        bankCity: '',
+      if (selectedTransaction !== null) {
+        reset({
+          userId: selectedTransaction.userId,
+          activityId: selectedTransaction.activityId,
+          date: selectedTransaction.date,
+          amount: selectedTransaction.amount,
+          paymentMethod: selectedTransaction.paymentMethod,
+          checkNumber: selectedTransaction.checkNumber,
+          bankName: selectedTransaction.bankName,
+          bankCity: selectedTransaction.bankCity,
+          notes: selectedTransaction.notes,
+        });
+      } else {
+        reset({
+          userId: selectedUserId ?? 0,
+          activityId: 0,
+          date: '',
+          amount: 0,
+          paymentMethod: 0,
+          checkNumber: 0,
+          bankName: '',
+          bankCity: '',
           notes: '',
-      });
+        });
+      }
     }, 0);
     return () => clearTimeout(timer);
-  }, [isOpen, selectedUserId, reset]);
+  }, [isOpen, selectedUserId, selectedTransaction, reset]);
 
   const selectedPaymentMethodId = watch('paymentMethod');
   const selectedPaymentMethod = paymentMethods.find((p) => p.id === selectedPaymentMethodId);
   const isCheck = selectedPaymentMethod?.description === CHECK_LABEL;
+
+  const isEditMode = selectedTransaction !== null;
+  const userSelectDisabled = selectedUserId !== null || isEditMode;
 
   async function onSubmit(values: FormValues) {
     await onSave(values);
@@ -111,7 +136,7 @@ export function DonationForm({ isOpen, selectedUserId, isSaving, onSave, onClose
     <Dialog open={isOpen} onOpenChange={(open: boolean) => { if (!open) onClose(); }}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Nouveau don</DialogTitle>
+          <DialogTitle>{isEditMode ? 'Modifier le don' : 'Nouveau don'}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
@@ -121,7 +146,7 @@ export function DonationForm({ isOpen, selectedUserId, isSaving, onSave, onClose
             <Select
               value={watch('userId') > 0 ? String(watch('userId')) : ''}
               onValueChange={(val: string) => setValue('userId', Number(val), { shouldValidate: true })}
-              disabled={selectedUserId !== null}
+              disabled={userSelectDisabled}
             >
               <SelectTrigger id="userId" className="w-full">
                 <SelectValue placeholder="Sélectionner…" />
