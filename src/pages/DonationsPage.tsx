@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 import type { DonationFilters, Transaction } from '@/types';
 import { useDonations } from '@/hooks/useDonations';
 import { useDonationModal } from '@/hooks/useDonationModal';
+import { useDonationDelete } from '@/hooks/useDonationDelete';
 import { DonationFilters as DonationFiltersComponent } from '@/components/donations/DonationFilters';
 import { DonationTable } from '@/components/donations/DonationTable';
 import { DonationForm } from '@/components/donations/DonationForm';
+import { DonationDeleteDialog } from '@/components/donations/DonationDeleteDialog';
 import { Button } from '@/components/ui/button';
 
 const EMPTY_FILTERS: DonationFilters = {};
@@ -14,11 +16,19 @@ export function DonationsPage() {
   const { users, activities, paymentMethods, isLoading, error, filterDonations, reload } =
     useDonations();
   const [filters, setFilters] = useState<DonationFilters>(EMPTY_FILTERS);
+  const isEditRef = useRef(false);
 
   const donationModal = useDonationModal({
     onSuccess: () => {
       reload();
-      toast.success('Don enregistré avec succès');
+      toast.success(isEditRef.current ? 'Don modifié avec succès' : 'Don enregistré avec succès');
+    },
+  });
+
+  const donationDelete = useDonationDelete({
+    onSuccess: () => {
+      reload();
+      toast.success('Don supprimé');
     },
   });
 
@@ -26,6 +36,16 @@ export function DonationsPage() {
 
   function handleSelect(transaction: Transaction) {
     console.log(transaction);
+  }
+
+  function handleEdit(transaction: Transaction) {
+    isEditRef.current = true;
+    donationModal.openEdit(transaction);
+  }
+
+  function handleOpenCreate() {
+    isEditRef.current = false;
+    donationModal.openCreate();
   }
 
   return (
@@ -39,7 +59,7 @@ export function DonationsPage() {
             </span>
           )}
         </div>
-        <Button onClick={() => donationModal.openCreate()}>Ajouter un don</Button>
+        <Button onClick={handleOpenCreate}>Ajouter un don</Button>
       </div>
 
       <DonationFiltersComponent
@@ -72,15 +92,26 @@ export function DonationsPage() {
           activities={activities}
           paymentMethods={paymentMethods}
           onSelect={handleSelect}
+          onEdit={handleEdit}
+          onDelete={(transaction) => donationDelete.confirmDelete(transaction)}
         />
       )}
 
       <DonationForm
         isOpen={donationModal.isOpen}
         selectedUserId={donationModal.selectedUserId}
+        selectedTransaction={donationModal.selectedTransaction}
         isSaving={donationModal.isSaving}
         onSave={donationModal.save}
         onClose={donationModal.close}
+      />
+
+      <DonationDeleteDialog
+        transaction={donationDelete.deleteTarget}
+        isOpen={donationDelete.isDeleteOpen}
+        isDeleting={donationDelete.isDeleting}
+        onConfirm={donationDelete.handleDeleteConfirm}
+        onCancel={donationDelete.handleDeleteCancel}
       />
     </div>
   );
