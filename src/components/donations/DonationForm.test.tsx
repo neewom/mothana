@@ -130,4 +130,43 @@ describe('DonationForm', () => {
     screen.getByRole('button', { name: /annuler/i }).click();
     expect(defaultProps.onClose).toHaveBeenCalledOnce();
   });
+
+  it('shows "Supprimer ce don" button in edit mode when onDelete is provided', async () => {
+    const onDelete = vi.fn();
+    render(
+      <DonationForm
+        {...defaultProps}
+        selectedTransaction={existingTransaction}
+        onDelete={onDelete}
+      />,
+    );
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /supprimer ce don/i })).toBeInTheDocument();
+    });
+  });
+
+  it('does not show "Supprimer ce don" button in create mode', async () => {
+    const onDelete = vi.fn();
+    render(<DonationForm {...defaultProps} onDelete={onDelete} />);
+    await waitFor(() => {
+      expect(screen.getByText('Nouveau don')).toBeInTheDocument();
+    });
+    expect(screen.queryByRole('button', { name: /supprimer ce don/i })).not.toBeInTheDocument();
+  });
+
+  it('"Supprimer ce don" button calls onDelete when clicked', async () => {
+    const onDelete = vi.fn();
+    render(
+      <DonationForm
+        {...defaultProps}
+        selectedTransaction={existingTransaction}
+        onDelete={onDelete}
+      />,
+    );
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /supprimer ce don/i })).toBeInTheDocument();
+    });
+    screen.getByRole('button', { name: /supprimer ce don/i }).click();
+    expect(onDelete).toHaveBeenCalledOnce();
+  });
 });

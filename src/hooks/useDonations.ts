@@ -1,15 +1,17 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { Transaction, Activity, PaymentMethod, User, DonationFilters } from '@/types';
+import type { Transaction, Activity, PaymentMethod, User, Civility, DonationFilters } from '@/types';
 import { transactionService } from '@/services/transactionService';
 import { activityService } from '@/services/activityService';
 import { paymentMethodService } from '@/services/paymentMethodService';
 import { userService } from '@/services/userService';
+import { civilityService } from '@/services/civilityService';
 
 interface UseDonationsResult {
   transactions: Transaction[];
   users: User[];
   activities: Activity[];
   paymentMethods: PaymentMethod[];
+  civilities: Civility[];
   isLoading: boolean;
   error: string | null;
   filterDonations: (filters: DonationFilters) => Transaction[];
@@ -21,6 +23,7 @@ export function useDonations(): UseDonationsResult {
   const [users, setUsers] = useState<User[]>([]);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+  const [civilities, setCivilities] = useState<Civility[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [tick, setTick] = useState(0);
@@ -35,13 +38,15 @@ export function useDonations(): UseDonationsResult {
       userService.getAll(),
       activityService.getAll(),
       paymentMethodService.getAll(),
+      civilityService.getAll(),
     ])
-      .then(([txs, us, acts, methods]) => {
+      .then(([txs, us, acts, methods, civs]) => {
         if (cancelled) return;
         setTransactions(txs);
         setUsers(us);
         setActivities(acts);
         setPaymentMethods(methods);
+        setCivilities(civs);
         setIsLoading(false);
       })
       .catch((err: unknown) => {
@@ -71,5 +76,5 @@ export function useDonations(): UseDonationsResult {
     [transactions]
   );
 
-  return { transactions, users, activities, paymentMethods, isLoading, error, filterDonations, reload };
+  return { transactions, users, activities, paymentMethods, civilities, isLoading, error, filterDonations, reload };
 }
