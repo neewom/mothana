@@ -51,17 +51,14 @@ describe('DonationTable', () => {
         activities={activities}
         paymentMethods={paymentMethods}
         onSelect={vi.fn()}
-        onEdit={vi.fn()}
-        onDelete={vi.fn()}
       />,
     );
     expect(screen.getByText('Date')).toBeInTheDocument();
     expect(screen.getByText('Utilisateur')).toBeInTheDocument();
     expect(screen.getByText('Montant')).toBeInTheDocument();
-    expect(screen.getByText('Actions')).toBeInTheDocument();
   });
 
-  it('renders edit and delete buttons for each row', () => {
+  it('does not render an Actions column', () => {
     render(
       <DonationTable
         transactions={transactions}
@@ -69,48 +66,42 @@ describe('DonationTable', () => {
         activities={activities}
         paymentMethods={paymentMethods}
         onSelect={vi.fn()}
-        onEdit={vi.fn()}
-        onDelete={vi.fn()}
       />,
     );
-    expect(screen.getAllByRole('button', { name: /modifier/i })).toHaveLength(transactions.length);
-    expect(screen.getAllByRole('button', { name: /supprimer/i })).toHaveLength(transactions.length);
+    expect(screen.queryByText('Actions')).not.toBeInTheDocument();
   });
 
-  it('edit button calls onEdit with the correct transaction', () => {
-    const onEdit = vi.fn();
+  it('row click calls onSelect with the correct transaction', () => {
+    const onSelect = vi.fn();
     render(
       <DonationTable
         transactions={transactions}
         users={users}
         activities={activities}
         paymentMethods={paymentMethods}
-        onSelect={vi.fn()}
-        onEdit={onEdit}
-        onDelete={vi.fn()}
+        onSelect={onSelect}
       />,
     );
-    fireEvent.click(screen.getAllByRole('button', { name: /modifier/i })[0]);
-    expect(onEdit).toHaveBeenCalledOnce();
-    expect(onEdit).toHaveBeenCalledWith(transactions[0]);
+    fireEvent.click(screen.getByText('15/03/2024'));
+    expect(onSelect).toHaveBeenCalledOnce();
+    expect(onSelect).toHaveBeenCalledWith(transactions[0]);
   });
 
-  it('delete button calls onDelete with the correct transaction', () => {
-    const onDelete = vi.fn();
+  it('selected row has data-state="selected"', () => {
     render(
       <DonationTable
         transactions={transactions}
         users={users}
         activities={activities}
         paymentMethods={paymentMethods}
+        selectedTransactionId={transactions[0].id}
         onSelect={vi.fn()}
-        onEdit={vi.fn()}
-        onDelete={onDelete}
       />,
     );
-    fireEvent.click(screen.getAllByRole('button', { name: /supprimer/i })[0]);
-    expect(onDelete).toHaveBeenCalledOnce();
-    expect(onDelete).toHaveBeenCalledWith(transactions[0]);
+    const rows = screen.getAllByRole('row');
+    // rows[0] = header, rows[1] = first data row
+    expect(rows[1]).toHaveAttribute('data-state', 'selected');
+    expect(rows[2]).not.toHaveAttribute('data-state', 'selected');
   });
 
   it('formats the date as dd/mm/yyyy', () => {
@@ -121,8 +112,6 @@ describe('DonationTable', () => {
         activities={activities}
         paymentMethods={paymentMethods}
         onSelect={vi.fn()}
-        onEdit={vi.fn()}
-        onDelete={vi.fn()}
       />,
     );
     expect(screen.getByText('15/03/2024')).toBeInTheDocument();
@@ -136,8 +125,6 @@ describe('DonationTable', () => {
         activities={activities}
         paymentMethods={paymentMethods}
         onSelect={vi.fn()}
-        onEdit={vi.fn()}
-        onDelete={vi.fn()}
       />,
     );
     expect(screen.getByText(/75,50\s*€/)).toBeInTheDocument();
@@ -151,8 +138,6 @@ describe('DonationTable', () => {
         activities={activities}
         paymentMethods={paymentMethods}
         onSelect={vi.fn()}
-        onEdit={vi.fn()}
-        onDelete={vi.fn()}
       />,
     );
     expect(screen.getAllByText('Jean Dupont')).toHaveLength(transactions.length);
@@ -166,8 +151,6 @@ describe('DonationTable', () => {
         activities={activities}
         paymentMethods={paymentMethods}
         onSelect={vi.fn()}
-        onEdit={vi.fn()}
-        onDelete={vi.fn()}
       />,
     );
     expect(screen.getByText('Aucun don trouvé')).toBeInTheDocument();

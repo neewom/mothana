@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { toast } from 'sonner';
 import type { User, Civility, Transaction } from '@/types';
 import { useUserTransactions } from '@/hooks/useUserTransactions';
@@ -19,7 +19,6 @@ interface UserDonationsProps {
 export function UserDonations({ user, civilities, onClose }: UserDonationsProps) {
   const { transactions, activities, paymentMethods, isLoading, error, reload } =
     useUserTransactions(user.id);
-  const [selectedTransactionId, setSelectedTransactionId] = useState<number | undefined>();
   const isEditRef = useRef(false);
 
   const donationModal = useDonationModal({
@@ -32,6 +31,7 @@ export function UserDonations({ user, civilities, onClose }: UserDonationsProps)
   const donationDelete = useDonationDelete({
     onSuccess: () => {
       reload();
+      donationModal.close();
       toast.success('Don supprimé');
     },
   });
@@ -40,10 +40,6 @@ export function UserDonations({ user, civilities, onClose }: UserDonationsProps)
   const total = transactions.reduce((sum, t) => sum + t.amount, 0);
 
   function handleSelect(transaction: Transaction) {
-    setSelectedTransactionId(transaction.id);
-  }
-
-  function handleEdit(transaction: Transaction) {
     isEditRef.current = true;
     donationModal.openEdit(transaction);
   }
@@ -107,10 +103,8 @@ export function UserDonations({ user, civilities, onClose }: UserDonationsProps)
           transactions={transactions}
           activities={activities}
           paymentMethods={paymentMethods}
-          selectedTransactionId={selectedTransactionId}
+          selectedTransactionId={donationModal.selectedTransaction?.id}
           onSelect={handleSelect}
-          onEdit={handleEdit}
-          onDelete={(transaction) => donationDelete.confirmDelete(transaction)}
         />
       )}
 
@@ -121,6 +115,11 @@ export function UserDonations({ user, civilities, onClose }: UserDonationsProps)
         isSaving={donationModal.isSaving}
         onSave={donationModal.save}
         onClose={donationModal.close}
+        onDelete={
+          donationModal.selectedTransaction !== null
+            ? () => donationDelete.confirmDelete(donationModal.selectedTransaction!)
+            : undefined
+        }
       />
 
       <DonationDeleteDialog

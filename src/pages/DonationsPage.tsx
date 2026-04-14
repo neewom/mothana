@@ -6,6 +6,7 @@ import { useDonationModal } from '@/hooks/useDonationModal';
 import { useDonationDelete } from '@/hooks/useDonationDelete';
 import { DonationFilters as DonationFiltersComponent } from '@/components/donations/DonationFilters';
 import { DonationTable } from '@/components/donations/DonationTable';
+import { DonationDetail } from '@/components/donations/DonationDetail';
 import { DonationForm } from '@/components/donations/DonationForm';
 import { DonationDeleteDialog } from '@/components/donations/DonationDeleteDialog';
 import { Button } from '@/components/ui/button';
@@ -13,9 +14,10 @@ import { Button } from '@/components/ui/button';
 const EMPTY_FILTERS: DonationFilters = {};
 
 export function DonationsPage() {
-  const { users, activities, paymentMethods, isLoading, error, filterDonations, reload } =
+  const { users, activities, paymentMethods, civilities, isLoading, error, filterDonations, reload } =
     useDonations();
   const [filters, setFilters] = useState<DonationFilters>(EMPTY_FILTERS);
+  const [selectedTransactionId, setSelectedTransactionId] = useState<number | undefined>();
   const isEditRef = useRef(false);
 
   const donationModal = useDonationModal({
@@ -27,15 +29,23 @@ export function DonationsPage() {
 
   const donationDelete = useDonationDelete({
     onSuccess: () => {
+      setSelectedTransactionId(undefined);
       reload();
       toast.success('Don supprimé');
     },
   });
 
   const filtered = filterDonations(filters);
+  const selectedTransaction = selectedTransactionId !== undefined
+    ? filtered.find((t) => t.id === selectedTransactionId)
+    : undefined;
 
   function handleSelect(transaction: Transaction) {
-    console.log(transaction);
+    setSelectedTransactionId(transaction.id);
+  }
+
+  function handleCloseDetail() {
+    setSelectedTransactionId(undefined);
   }
 
   function handleEdit(transaction: Transaction) {
@@ -86,15 +96,28 @@ export function DonationsPage() {
       )}
 
       {!isLoading && !error && (
-        <DonationTable
-          transactions={filtered}
-          users={users}
-          activities={activities}
-          paymentMethods={paymentMethods}
-          onSelect={handleSelect}
-          onEdit={handleEdit}
-          onDelete={(transaction) => donationDelete.confirmDelete(transaction)}
-        />
+        <div className={selectedTransaction ? 'grid gap-4 lg:grid-cols-2' : undefined}>
+          <DonationTable
+            transactions={filtered}
+            users={users}
+            activities={activities}
+            paymentMethods={paymentMethods}
+            selectedTransactionId={selectedTransactionId}
+            onSelect={handleSelect}
+          />
+          {selectedTransaction && (
+            <DonationDetail
+              transaction={selectedTransaction}
+              users={users}
+              activities={activities}
+              paymentMethods={paymentMethods}
+              civilities={civilities}
+              onEdit={handleEdit}
+              onDelete={(transaction) => donationDelete.confirmDelete(transaction)}
+              onClose={handleCloseDetail}
+            />
+          )}
+        </div>
       )}
 
       <DonationForm

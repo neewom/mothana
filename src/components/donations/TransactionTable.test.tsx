@@ -68,65 +68,40 @@ describe('TransactionTable', () => {
         activities={activities}
         paymentMethods={paymentMethods}
         onSelect={vi.fn()}
-        onEdit={vi.fn()}
-        onDelete={vi.fn()}
       />,
     );
     expect(screen.getByText('Date')).toBeInTheDocument();
     expect(screen.getByText('Activité')).toBeInTheDocument();
     expect(screen.getByText('Montant')).toBeInTheDocument();
     expect(screen.getByText('Règlement')).toBeInTheDocument();
-    expect(screen.getByText('Actions')).toBeInTheDocument();
     expect(screen.queryByText('N° reçu')).not.toBeInTheDocument();
   });
 
-  it('renders edit and delete buttons for each row', () => {
+  it('does not render an Actions column', () => {
     render(
       <TransactionTable
         transactions={transactions}
         activities={activities}
         paymentMethods={paymentMethods}
         onSelect={vi.fn()}
-        onEdit={vi.fn()}
-        onDelete={vi.fn()}
       />,
     );
-    expect(screen.getAllByRole('button', { name: /modifier/i })).toHaveLength(transactions.length);
-    expect(screen.getAllByRole('button', { name: /supprimer/i })).toHaveLength(transactions.length);
+    expect(screen.queryByText('Actions')).not.toBeInTheDocument();
   });
 
-  it('edit button calls onEdit with the correct transaction', () => {
-    const onEdit = vi.fn();
+  it('row click calls onSelect with the correct transaction', () => {
+    const onSelect = vi.fn();
     render(
       <TransactionTable
         transactions={transactions}
         activities={activities}
         paymentMethods={paymentMethods}
-        onSelect={vi.fn()}
-        onEdit={onEdit}
-        onDelete={vi.fn()}
+        onSelect={onSelect}
       />,
     );
-    fireEvent.click(screen.getAllByRole('button', { name: /modifier/i })[0]);
-    expect(onEdit).toHaveBeenCalledOnce();
-    expect(onEdit).toHaveBeenCalledWith(transactions[0]);
-  });
-
-  it('delete button calls onDelete with the correct transaction', () => {
-    const onDelete = vi.fn();
-    render(
-      <TransactionTable
-        transactions={transactions}
-        activities={activities}
-        paymentMethods={paymentMethods}
-        onSelect={vi.fn()}
-        onEdit={vi.fn()}
-        onDelete={onDelete}
-      />,
-    );
-    fireEvent.click(screen.getAllByRole('button', { name: /supprimer/i })[0]);
-    expect(onDelete).toHaveBeenCalledOnce();
-    expect(onDelete).toHaveBeenCalledWith(transactions[0]);
+    fireEvent.click(screen.getByText('15/01/2024'));
+    expect(onSelect).toHaveBeenCalledOnce();
+    expect(onSelect).toHaveBeenCalledWith(transactions[0]);
   });
 
   it('formats date as dd/mm/yyyy', () => {
@@ -136,8 +111,6 @@ describe('TransactionTable', () => {
         activities={activities}
         paymentMethods={paymentMethods}
         onSelect={vi.fn()}
-        onEdit={vi.fn()}
-        onDelete={vi.fn()}
       />,
     );
     expect(screen.getByText('15/01/2024')).toBeInTheDocument();
@@ -151,8 +124,6 @@ describe('TransactionTable', () => {
         activities={activities}
         paymentMethods={paymentMethods}
         onSelect={vi.fn()}
-        onEdit={vi.fn()}
-        onDelete={vi.fn()}
       />,
     );
     expect(screen.getByText('50,00 €')).toBeInTheDocument();
@@ -166,8 +137,6 @@ describe('TransactionTable', () => {
         activities={activities}
         paymentMethods={paymentMethods}
         onSelect={vi.fn()}
-        onEdit={vi.fn()}
-        onDelete={vi.fn()}
       />,
     );
     expect(screen.getByText('Don général')).toBeInTheDocument();
@@ -183,28 +152,9 @@ describe('TransactionTable', () => {
         activities={activities}
         paymentMethods={paymentMethods}
         onSelect={vi.fn()}
-        onEdit={vi.fn()}
-        onDelete={vi.fn()}
       />,
     );
     expect(screen.getByText('Aucun don enregistré pour cet utilisateur')).toBeInTheDocument();
-  });
-
-  it('calls onSelect with the correct transaction when a row is clicked', () => {
-    const onSelect = vi.fn();
-    render(
-      <TransactionTable
-        transactions={transactions}
-        activities={activities}
-        paymentMethods={paymentMethods}
-        onSelect={onSelect}
-        onEdit={vi.fn()}
-        onDelete={vi.fn()}
-      />,
-    );
-    fireEvent.click(screen.getByText('15/01/2024'));
-    expect(onSelect).toHaveBeenCalledOnce();
-    expect(onSelect).toHaveBeenCalledWith(transactions[0]);
   });
 
   it('does not call onSelect when table is empty', () => {
@@ -215,8 +165,6 @@ describe('TransactionTable', () => {
         activities={activities}
         paymentMethods={paymentMethods}
         onSelect={onSelect}
-        onEdit={vi.fn()}
-        onDelete={vi.fn()}
       />,
     );
     expect(onSelect).not.toHaveBeenCalled();

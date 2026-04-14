@@ -46,6 +46,7 @@ interface DonationFormProps {
   isSaving: boolean;
   onSave: (data: Omit<Transaction, 'id'>) => Promise<void>;
   onClose: () => void;
+  onDelete?: () => void;
 }
 
 export function DonationForm({
@@ -55,6 +56,7 @@ export function DonationForm({
   isSaving,
   onSave,
   onClose,
+  onDelete,
 }: DonationFormProps) {
   const [users, setUsers] = useState<User[]>([]);
   const [activities, setActivities] = useState<Activity[]>([]);
@@ -257,6 +259,17 @@ export function DonationForm({
           </div>
 
           <DialogFooter className="gap-2">
+            {isEditMode && onDelete && (
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={onDelete}
+                disabled={isSaving}
+                className="mr-auto"
+              >
+                Supprimer ce don
+              </Button>
+            )}
             <Button type="button" variant="outline" onClick={onClose} disabled={isSaving}>
               Annuler
             </Button>
