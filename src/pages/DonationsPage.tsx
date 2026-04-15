@@ -4,11 +4,13 @@ import type { DonationFilters, Transaction } from '@/types';
 import { useDonations } from '@/hooks/useDonations';
 import { useDonationModal } from '@/hooks/useDonationModal';
 import { useDonationDelete } from '@/hooks/useDonationDelete';
+import { useDonationStats } from '@/hooks/useDonationStats';
 import { DonationFilters as DonationFiltersComponent } from '@/components/donations/DonationFilters';
 import { DonationTable } from '@/components/donations/DonationTable';
 import { DonationDetail } from '@/components/donations/DonationDetail';
 import { DonationForm } from '@/components/donations/DonationForm';
 import { DonationDeleteDialog } from '@/components/donations/DonationDeleteDialog';
+import { DonationStatsSection } from '@/components/donations/DonationStatsSection';
 import { Button } from '@/components/ui/button';
 
 const EMPTY_FILTERS: DonationFilters = {};
@@ -39,6 +41,7 @@ export function DonationsPage() {
   const selectedTransaction = selectedTransactionId !== undefined
     ? filtered.find((t) => t.id === selectedTransactionId)
     : undefined;
+  const stats = useDonationStats(filtered, activities, paymentMethods);
 
   function handleSelect(transaction: Transaction) {
     setSelectedTransactionId(transaction.id);
@@ -94,6 +97,8 @@ export function DonationsPage() {
           {error}
         </div>
       )}
+
+      {!isLoading && !error && <DonationStatsSection stats={stats} />}
 
       {!isLoading && !error && (
         <div className={selectedTransaction ? 'grid gap-4 lg:grid-cols-2' : undefined}>
